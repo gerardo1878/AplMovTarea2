@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Api BBad</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    </head>
+
+    <body style="background-color: black;">
+        <img style="display: block; margin: 0 auto;" src="https://seeklogo.com/images/B/breaking-bad-logo-BDD820B807-seeklogo.com.png">
+        <div class="container">
+            <div style="text-align: center;">
+                <h3 style="color: blanchedalmond;">Bienvenido al laboratorio de metanfetamina</h3>
+                <button class="btn btn-success" onclick="search()">Buscar</button>
+            </div>
+            <div id="results"></div>
+
+            <div style="text-align: right;" id="footerPage">
+                <button style="display:none;" id="buttonBack" onclick="back()" class="btn btn-warning"> << </button>
+                <button style="display:none;" id="buttonNext" onclick="next()" class="btn btn-success"> >> </button>
+        </div>
+
+        <script>
+
+            var nextPage="";
+            var lastPage="";
+            var currentApiURL="";
+
+            function next(){
+                currentApiURL=nextPage;
+                breakingbad();
+            }
+
+            function back(){
+                currentApiURL=lastPage;
+                breakingbad();
+            }
+
+            function search(){
+                
+                currentApiURL="https://www.breakingbadapi.com/api/characters";
+                breakingbad();
+            }
+
+            function breakingbad(){
+                
+                document.getElementById("results").innerHTML='';
+                
+                var data = undefined;
+                var request= new XMLHttpRequest();
+                request.open('GET',currentApiURL,true);
+                request.send();
+                request.onreadystatechange=function(){
+                    if(this.readyState== 4 && this.status== 200){
+                        
+
+                        var resultRawData= this.response;
+                        data = JSON.parse(resultRawData);
+
+                    }
+                }
+            }
+
+            function showApiData(data){
+                var elemento= document.getElementById("results");
+                var countingHTML = document.createElement('h4');
+                countingHTML.style.color="green";
+                countingHTML.innerHTML="Numero de actores encontrados: "+ data.count;
+                elemento.appendChild(countingHTML);
+
+                for(var i=0; i<data.results.lenght; i++){
+                    var currentItem= data.results[i];
+                    var personaje = document.createElement('h5');
+                    personaje.style.color="sky";
+                    var htmlStyle="<hr/ ><strong>"+ currentItem.name + "</strong><br />";
+                    htmlStyle+="Genero" + currentItem.gender;
+                    personaje.innerHTML= htmlStyle;
+
+                    document.getElementById('results').appendChild(personaje);
+                }
+                debugger;
+
+                if(data.next != null){
+                    document.getElementById("buttonNext").style.display = "inline";
+                    nextPage=data.next;
+                }else{
+                    document.getElementById("buttonNext").style.display="none";
+                }
+
+                if(data.previous != null){
+                    debugger;
+                    document.getElementById("buttonBack").style.display="inline";
+                    lastPage=data.previous;
+                }else{
+                    document.getElementById("buttonBack").style.display="none";
+                }
+            }
+
+        </script>
+
+    </body>
+</html>
